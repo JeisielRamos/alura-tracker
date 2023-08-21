@@ -27,11 +27,14 @@ export default defineComponent({
     },
     methods: {
         finishTask (seconds: number) : void {
-            console.log(seconds, this.description)
-            
+            this.$emit('whenSaveTask', {
+                seconds: seconds,
+                description: this.description
+            })
             this.description = ''
         }
-    }
+    },
+    emits: ['whenSaveTask']
 })
 </script>
 
