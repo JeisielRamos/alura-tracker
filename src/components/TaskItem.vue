@@ -1,5 +1,5 @@
 <template>
-    <BoxCard >
+    <BoxCard>
         <div class="columns">
             <div class="column is-7">
                 {{ task.description || 'Tarefa sem descrição' }}
@@ -31,9 +31,3 @@ export default defineComponent({
     }
 })
 </script>
-
-<style scoped>
-.box {
-    background: #FAF0CA;
-}
-</style>
