@@ -7,6 +7,9 @@
       <FormTask @whenSaveTask="saveTask" />
       <div class="list">
         <TaskItem v-for="(task, idx) in tasks" :key="idx" :task="task"/>
+        <BoxCard v-if="tasksIsEmpty">
+          Você não está muito produtivo hoje :(
+        </BoxCard>
       </div>
     </div>
   </main>
@@ -17,6 +20,7 @@ import { defineComponent } from 'vue';
 import SideBar from './components/SideBar.vue'
 import FormTask from './components/FormTask.vue'
 import TaskItem from './components/TaskItem.vue';
+import BoxCard from './components/BoxCard.vue';
 import ITask from './interfaces/ITask'
 
 export default defineComponent({
@@ -24,11 +28,17 @@ export default defineComponent({
   components: {
     SideBar,
     FormTask,
+    BoxCard,
     TaskItem
   },
   data() {
     return {
       tasks: [] as ITask[]
+    }
+  },
+  computed: {
+    tasksIsEmpty() : boolean {
+      return this.tasks.length === 0
     }
   },
   methods: {
