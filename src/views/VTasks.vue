@@ -18,7 +18,7 @@ import BoxCard from '../components/BoxCard.vue';
 import ITask from '../interfaces/ITask'
 
 export default defineComponent({
-    name: 'App',
+    name: 'VTasks',
     components: {
         FormTask,
         BoxCard,
