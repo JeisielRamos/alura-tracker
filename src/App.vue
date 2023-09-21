@@ -4,6 +4,7 @@
       <SideBar @whenSetTheme="setTheme" />
     </div>
     <div class="column is-three-quarter content">
+      <NotificationsCard />
       <router-view></router-view>
     </div>
   </main>
@@ -12,11 +13,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SideBar from './components/SideBar.vue'
+import NotificationsCard from './components/NotificationsCard.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
-    SideBar
+    SideBar,
+    NotificationsCard
   },
   data() {
     return {

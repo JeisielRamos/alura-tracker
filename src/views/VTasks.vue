@@ -1,8 +1,8 @@
 <template>
     <div class="column is-three-quarter content">
-        <FormTask @whenSaveTask="saveTask" />
+        <FormTask />
         <div class="list">
-            <TaskItem v-for="(task, idx) in tasks" :key="idx" :task="task" />
+            <TaskItem v-for="(task, idx) in tasks" :key="idx" :task="task"  @whenDeleteTask="deleteTask" />
             <BoxCard v-if="tasksIsEmpty">
                 Você não está muito produtivo hoje :(
             </BoxCard>
@@ -11,11 +11,12 @@
 </template>
   
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import FormTask from '../components/FormTask.vue'
 import TaskItem from '../components/TaskItem.vue';
 import BoxCard from '../components/BoxCard.vue';
-import ITask from '../interfaces/ITask'
+import { useStore } from '@/store';
+import { DELETE_TASKS } from '@/store/typesMutations';
 
 export default defineComponent({
     name: 'VTasks',
@@ -24,19 +25,21 @@ export default defineComponent({
         BoxCard,
         TaskItem
     },
-    data() {
-        return {
-            tasks: [] as ITask[]
-        }
-    },
     computed: {
         tasksIsEmpty(): boolean {
             return this.tasks.length === 0
         }
     },
     methods: {
-        saveTask(task: ITask) {
-            this.tasks.push(task)
+        deleteTask(description: string) {            
+            this.store.commit(DELETE_TASKS, description)
+        }
+    },
+    setup() {
+        const store = useStore()
+        return {
+            store,
+            tasks:  computed(() => store.state.tasks)
         }
     }
 });

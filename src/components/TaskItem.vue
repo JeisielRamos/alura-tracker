@@ -7,6 +7,12 @@
             <div class="column">
                 <TimerTask :seconds="task.seconds" />
             </div>
+
+            <button class="button ml-2 is-danger" @click="deleteTask(task.description)">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
+            </button>
         </div>
     </BoxCard>
 </template>
@@ -28,6 +34,12 @@ export default defineComponent({
             type: Object as PropType<ITask>,
             required: true
         }
-    }
+    },
+    methods: {
+        deleteTask(description: string) {
+            this.$emit('whenDeleteTask', description)
+        }
+    },
+    emits: ['whenDeleteTask']
 })
 </script>

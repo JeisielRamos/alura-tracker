@@ -26,12 +26,16 @@ import { computed, defineComponent } from 'vue';
 import TimerForm from './TimerForm.vue';
 import { useStore } from 'vuex';
 import { key } from '@/store'
+import { ADD_TASKS } from '@/store/typesMutations';
+import { TypeNotification } from '@/interfaces/INotifications';
+import { notificationMixin } from '@/mixins/notify'
 
 export default defineComponent({
     name: 'FormTask',
     components: {
         TimerForm
     },
+    mixins: [notificationMixin],
     data() {
         return {
             description: '',
@@ -40,10 +44,15 @@ export default defineComponent({
     },
     methods: {
         finishTask(seconds: number): void {
-            this.$emit('whenSaveTask', {
+            const project = this.projects.find(p => p.id == this.idProject)
+            if (!project) {
+                this.notify(TypeNotification.DANGER,  'Ops!', 'Selecione um projeto antes de finalizar a tarefa')
+                return;
+            }
+            this.store.commit(ADD_TASKS, {
                 seconds: seconds,
                 description: this.description,
-                project: this.projects.find(p => p.id == this.idProject)
+                project: project
             })
             this.description = ''
         }
@@ -51,10 +60,10 @@ export default defineComponent({
     setup() {
         const store = useStore(key)
         return {
+            store,
             projects: computed(() => store.state.projects)
         }
-    },
-    emits: ['whenSaveTask']
+    }
 })
 </script>
 
