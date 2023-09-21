@@ -28,14 +28,13 @@ import { useStore } from 'vuex';
 import { key } from '@/store'
 import { ADD_TASKS } from '@/store/typesMutations';
 import { TypeNotification } from '@/interfaces/INotifications';
-import { notificationMixin } from '@/mixins/notify'
+import useNotification from '@/hooks/notify'
 
 export default defineComponent({
     name: 'FormTask',
     components: {
         TimerForm
     },
-    mixins: [notificationMixin],
     data() {
         return {
             description: '',
@@ -59,9 +58,11 @@ export default defineComponent({
     },
     setup() {
         const store = useStore(key)
+        const { notify } = useNotification()
         return {
             store,
-            projects: computed(() => store.state.projects)
+            projects: computed(() => store.state.projects),
+            notify
         }
     }
 })
