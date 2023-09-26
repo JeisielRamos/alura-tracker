@@ -15,9 +15,9 @@
 
 import { computed, defineComponent } from 'vue';
 import { useStore } from '../../store'
-import { UPDATE_PROJECT, ADD_PROJECT, NOTIFY } from '@/store/typesMutations';
 import { TypeNotification } from '@/interfaces/INotifications';
 import { notificationMixin } from '@/mixins/notify';
+import { ALTER_PROJECTS, REGISTER_PROJECTS } from '@/store/typeActions';
 
 export default defineComponent({
     name: 'VProjectForm',
@@ -39,17 +39,27 @@ export default defineComponent({
         };
     },
     methods: {
-        saveProject() {            
+        saveProject() {
             if (this.id) {
-                this.store.commit(UPDATE_PROJECT, {
+                this.store.dispatch(ALTER_PROJECTS, {
                     id: this.id,
                     name: this.projectName
                 })
+                    .then(() => this.dispatchSuccess())
+                    .catch((response) => {
+                        this.notify(TypeNotification.DANGER, 'Erro ao alterar Projeto!', response.message)
+                    })
             } else {
-                this.store.commit(ADD_PROJECT, this.projectName)
+                this.store.dispatch(REGISTER_PROJECTS, this.projectName)
+                    .then(() => this.dispatchSuccess())
+                    .catch((response) => {
+                        this.notify(TypeNotification.DANGER, 'Erro ao salvar Projeto!', response.message)
+                    })
             }
-            
-            this.notify(TypeNotification.SUCCESS, 'Novo projeto salvo!', 'O projeto '+this.projectName+' esta disponivel')
+
+        },
+        dispatchSuccess() {
+            this.notify(TypeNotification.SUCCESS, 'Novo projeto salvo!', 'O projeto ' + this.projectName + ' esta disponivel')
             this.projectName = "";
             this.$router.push('/projetos')
         }
