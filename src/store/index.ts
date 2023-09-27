@@ -5,7 +5,7 @@ import { ADD_PROJECT, UPDATE_PROJECT, DELETE_PROJECT, ADD_TASKS, DELETE_TASKS, N
 import ITask from "@/interfaces/ITask";
 import { INotifications } from "@/interfaces/INotifications";
 import clientHTTP from "@/http";
-import { ALTER_PROJECTS, GET_PROJECTS, REGISTER_PROJECTS, REMOVE_PROJECTS } from "./typeActions";
+import { ALTER_PROJECTS, DEFINE_TASKS, GET_PROJECTS, GET_TASKS, REGISTER_PROJECTS, REGISTER_TASKS, REMOVE_PROJECTS } from "./typeActions";
 import { HttpStatusCode } from "axios";
 
 interface State {
@@ -47,6 +47,9 @@ export const store = createStore<State>({
         [DELETE_TASKS](state, taskDescription: string){            
             state.tasks = state.tasks.filter(t => t.description != taskDescription)
         },
+        [DEFINE_TASKS](state, tasks: ITask[]){
+            state.tasks = tasks
+        },
         [NOTIFY](state, notification: INotifications) {
             notification.id = new Date().getTime()
             state.notifications.push(notification)
@@ -72,7 +75,15 @@ export const store = createStore<State>({
         [REMOVE_PROJECTS]({ commit }, projectID: string){
             return clientHTTP.delete(`/projetos/${projectID}`)
                 .then(() => commit(DELETE_PROJECT, projectID))
-        }
+        },
+        [GET_TASKS] ({ commit }) {
+            clientHTTP.get('tarefas')
+                .then(response => commit(DEFINE_TASKS, response.data))
+        },
+        [REGISTER_TASKS]({ commit }, task: ITask) {
+            return clientHTTP.post('/tarefas', task)
+                .then(response => commit(ADD_TASKS, response.data))
+        },
     }
 })
 

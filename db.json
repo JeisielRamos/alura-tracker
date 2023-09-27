@@ -4,5 +4,25 @@
       "id": 1,
       "name": "Alura Tracker"
     }
+  ],
+  "tarefas": [
+    {
+      "id": 1,
+      "seconds": 60,
+      "description": "tarefa tarefa",
+      "project": {
+        "id": 1,
+        "name": "Alura Tracker"
+      }
+    },
+    {
+      "id": 2,
+      "seconds": 1,
+      "description": "teste",
+      "project": {
+        "id": 1,
+        "name": "Alura Tracker"
+      }
+    }
   ]
 }

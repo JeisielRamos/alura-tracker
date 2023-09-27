@@ -2,7 +2,7 @@
     <div class="column is-three-quarter content">
         <FormTask />
         <div class="list">
-            <TaskItem v-for="(task, idx) in tasks" :key="idx" :task="task"  @whenDeleteTask="deleteTask" />
+            <TaskItem v-for="task in tasks" :key="task.id" :task="task"  @whenDeleteTask="deleteTask" />
             <BoxCard v-if="tasksIsEmpty">
                 Você não está muito produtivo hoje :(
             </BoxCard>
@@ -17,6 +17,7 @@ import TaskItem from '../components/TaskItem.vue';
 import BoxCard from '../components/BoxCard.vue';
 import { useStore } from '@/store';
 import { DELETE_TASKS } from '@/store/typesMutations';
+import { GET_PROJECTS, GET_TASKS } from '@/store/typeActions';
 
 export default defineComponent({
     name: 'VTasks',
@@ -37,6 +38,9 @@ export default defineComponent({
     },
     setup() {
         const store = useStore()
+        store.dispatch(GET_TASKS)
+        store.dispatch(GET_PROJECTS)
+
         return {
             store,
             tasks:  computed(() => store.state.tasks)
