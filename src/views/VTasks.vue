@@ -1,8 +1,18 @@
-//*<template>
+<template>
     <div class="column is-three-quarter content">
         <FormTask />
         <div class="list">
-            <TaskItem v-for="task in tasks" :key="task.id" :task="task"  @whenDeleteTask="deleteTask" @whenClickedTask="clickedTask"/>
+            <div class="field">
+                <p class="control has-icons-left has-icons-right">
+                    <input class="input" type="text" placeholder="Digite para filtrar" v-model="filter">
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </p>
+            </div>
+            <TaskItem v-for="task in tasks" :key="task.id" :task="task" @whenDeleteTask="deleteTask"
+                @whenClickedTask="clickedTask" />
+
             <BoxCard v-if="tasksIsEmpty">
                 Você não está muito produtivo hoje :(
             </BoxCard>
@@ -30,7 +40,7 @@
 </template>
   
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import FormTask from '../components/FormTask.vue'
 import TaskItem from '../components/TaskItem.vue';
 import BoxCard from '../components/BoxCard.vue';
@@ -57,34 +67,36 @@ export default defineComponent({
         }
     },
     methods: {
-        deleteTask(description: string) {            
+        deleteTask(description: string) {
             this.store.commit(DELETE_TASKS, description)
         },
         clickedTask(ctask: ITask) {
             this.task = ctask
         },
-        closeModal(){
+        closeModal() {
             this.task = null
         },
-        updateTask(){
+        updateTask() {
             this.store.dispatch(ALTER_TASK, this.task)
                 .then(() => this.closeModal())
         }
     },
-    setup() {  
-        const store = useStore()
-        store.dispatch(GET_TASKS)
-        store.dispatch(GET_PROJECTS)
+    setup() {
+        const store = useStore();
+        const filter = ref('');
 
+        store.dispatch(GET_TASKS);
+        store.dispatch(GET_PROJECTS);
+
+        const tasks = computed(() => store.state.task.tasks.filter(t => !filter.value || t.description.includes(filter.value)));
         return {
             store,
-            tasks:  computed(() => store.state.task.tasks)
+            tasks,
+            filter
         }
     }
 });
 </script>
   
-<style>
-
-</style>
+<style></style>
   
