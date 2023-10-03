@@ -1,6 +1,6 @@
 <template>
     <BoxCard>
-        <div class="columns">
+        <div class="columns clicked" @click="clickedTask">
             <div class="column is-4">
                 {{ task.description || 'Tarefa sem descrição' }}
             </div>
@@ -41,8 +41,17 @@ export default defineComponent({
     methods: {
         deleteTask(description: string) {
             this.$emit('whenDeleteTask', description)
+        },
+        clickedTask() {
+            this.$emit('whenClickedTask', this.task)
         }
     },
-    emits: ['whenDeleteTask']
+    emits: ['whenDeleteTask','whenClickedTask']
 })
 </script>
+
+<style scoped>
+.clicked {
+    cursor: pointer;
+}
+</style>

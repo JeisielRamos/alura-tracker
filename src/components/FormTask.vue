@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import {  computed, defineComponent, ref } from 'vue';
 import TimerForm from './TimerForm.vue';
 import { useStore } from 'vuex';
 import { key } from '@/store'
@@ -35,36 +35,34 @@ export default defineComponent({
     components: {
         TimerForm
     },
-    data() {
-        return {
-            description: '',
-            idProject: ''
-        }
-    },
-    methods: {
-        finishTask(seconds: number): void {
-            const project = this.projects.find(p => p.id == this.idProject)
-            if (!project) {
-                this.notify(TypeNotification.DANGER,  'Ops!', 'Selecione um projeto antes de finalizar a tarefa')
-                return;
-            }
-            this.store.dispatch(REGISTER_TASKS, {
-                id: this.newTaskID,
-                seconds: seconds,
-                description: this.description,
-                project: project
-            })
-            this.description = ''
-        }
-    },
     setup() {
         const store = useStore(key)
         const { notify } = useNotification()
+        const projects = computed(()=>store.state.project.projects)
+        const description = ref("")
+        const idProject = ref("")
+
+        
+        const finishTask = (seconds: number): void => {
+            const project = projects.value.find(p => p.id == idProject.value)
+            if (!project) {
+                notify(TypeNotification.DANGER,  'Ops!', 'Selecione um projeto antes de finalizar a tarefa')
+                return;
+            }
+            store.dispatch(REGISTER_TASKS, {
+                id:  store.state.task.tasks.length+1,
+                seconds: seconds,
+                description: description.value,
+                project: project
+            })
+            description.value = ''
+        }
+
         return {
-            store,
-            projects: computed(() => store.state.projects),
-            newTaskID: computed(() => store.state.tasks.length+1),
-            notify
+            description,
+            idProject,
+            projects,
+            finishTask
         }
     }
 })

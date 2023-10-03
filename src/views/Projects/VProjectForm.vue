@@ -13,11 +13,13 @@
 </template>
 <script lang="ts">
 
-import { computed, defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useStore } from '../../store'
 import { TypeNotification } from '@/interfaces/INotifications';
 import { notificationMixin } from '@/mixins/notify';
 import { ALTER_PROJECTS, REGISTER_PROJECTS } from '@/store/typeActions';
+import { useRouter } from 'vue-router';
+import  useNotify  from '@/hooks/notify';
 
 export default defineComponent({
     name: 'VProjectForm',
@@ -27,48 +29,46 @@ export default defineComponent({
         }
     },
     mixins: [notificationMixin],
-    mounted() {
-        if (this.id) {
-            const project = this.store.state.projects.find(p => p.id == this.id)
-            this.projectName = project?.name || ''
+    setup(props) {
+        const router = useRouter()
+        const store = useStore()
+        const projectName = ref("")
+        const {notify} = useNotify()
+
+        if (props.id) {
+            const project = store.state.project.projects.find(p => p.id == props.id)
+            projectName.value = project?.name || ''
         }
-    },
-    data() {
-        return {
-            projectName: ""
-        };
-    },
-    methods: {
-        saveProject() {
-            if (this.id) {
-                this.store.dispatch(ALTER_PROJECTS, {
-                    id: this.id,
-                    name: this.projectName
+        
+        const dispatchSuccess = () => {
+            notify(TypeNotification.SUCCESS, 'Novo projeto salvo!', 'O projeto ' + projectName.value + ' esta disponivel')
+            projectName.value = "";
+            router.push('/projetos')
+        }
+
+        const saveProject = () => {
+            if (props.id) {
+                store.dispatch(ALTER_PROJECTS, {
+                    id: props.id,
+                    name: projectName
                 })
-                    .then(() => this.dispatchSuccess())
+                    .then(() => dispatchSuccess())
                     .catch((response) => {
-                        this.notify(TypeNotification.DANGER, 'Erro ao alterar Projeto!', response.message)
+                        notify(TypeNotification.DANGER, 'Erro ao alterar Projeto!', response.message)
                     })
             } else {
-                this.store.dispatch(REGISTER_PROJECTS, this.projectName)
-                    .then(() => this.dispatchSuccess())
+                store.dispatch(REGISTER_PROJECTS, projectName)
+                    .then(() => dispatchSuccess())
                     .catch((response) => {
-                        this.notify(TypeNotification.DANGER, 'Erro ao salvar Projeto!', response.message)
+                        notify(TypeNotification.DANGER, 'Erro ao salvar Projeto!', response.message)
                     })
             }
 
-        },
-        dispatchSuccess() {
-            this.notify(TypeNotification.SUCCESS, 'Novo projeto salvo!', 'O projeto ' + this.projectName + ' esta disponivel')
-            this.projectName = "";
-            this.$router.push('/projetos')
         }
-    },
-    setup() {
-        const store = useStore()
+
         return {
-            store,
-            projects: computed(() => store.state.projects)
+            projectName,
+            saveProject
         }
     }
 })

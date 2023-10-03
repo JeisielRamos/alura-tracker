@@ -43,18 +43,16 @@ import { GET_PROJECTS, REMOVE_PROJECTS } from '@/store/typeActions';
 
 export default defineComponent({
     name: 'VProjectList',
-    methods: {
-        deleteProject(id: string){
-            this.store.dispatch(REMOVE_PROJECTS, id)
-        }
-    },
     setup() {
         const store = useStore()
         store.dispatch(GET_PROJECTS)
         
+        const deleteProject = (id: string) => {
+            store.dispatch(REMOVE_PROJECTS, id)
+        }
         return {
-            store,
-            projects: computed(() => store.state.projects)
+            projects: computed(() => store.state.project.projects),
+            deleteProject
         }
     }
 })

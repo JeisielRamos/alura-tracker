@@ -1,11 +1,30 @@
-<template>
+//*<template>
     <div class="column is-three-quarter content">
         <FormTask />
         <div class="list">
-            <TaskItem v-for="task in tasks" :key="task.id" :task="task"  @whenDeleteTask="deleteTask" />
+            <TaskItem v-for="task in tasks" :key="task.id" :task="task"  @whenDeleteTask="deleteTask" @whenClickedTask="clickedTask"/>
             <BoxCard v-if="tasksIsEmpty">
                 Você não está muito produtivo hoje :(
             </BoxCard>
+            <div class="modal" :class="{ 'is-active': task }" v-if="task">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title">Modal title</p>
+                        <button class="delete" aria-label="close" @click="closeModal"></button>
+                    </header>
+                    <section class="modal-card-body">
+                        <div class="field">
+                            <label for="description" class="label"> Descrição </label>
+                            <input type="text" class="input" v-model="task.description" id="description">
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                        <button class="button is-success" @click="updateTask">Alterar Tarefa</button>
+                        <button class="button" @click="closeModal">Cancelar</button>
+                    </footer>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -17,7 +36,8 @@ import TaskItem from '../components/TaskItem.vue';
 import BoxCard from '../components/BoxCard.vue';
 import { useStore } from '@/store';
 import { DELETE_TASKS } from '@/store/typesMutations';
-import { GET_PROJECTS, GET_TASKS } from '@/store/typeActions';
+import { ALTER_TASK, GET_PROJECTS, GET_TASKS } from '@/store/typeActions';
+import ITask from '@/interfaces/ITask';
 
 export default defineComponent({
     name: 'VTasks',
@@ -25,6 +45,11 @@ export default defineComponent({
         FormTask,
         BoxCard,
         TaskItem
+    },
+    data() {
+        return {
+            task: null as ITask | null
+        }
     },
     computed: {
         tasksIsEmpty(): boolean {
@@ -34,16 +59,26 @@ export default defineComponent({
     methods: {
         deleteTask(description: string) {            
             this.store.commit(DELETE_TASKS, description)
+        },
+        clickedTask(ctask: ITask) {
+            this.task = ctask
+        },
+        closeModal(){
+            this.task = null
+        },
+        updateTask(){
+            this.store.dispatch(ALTER_TASK, this.task)
+                .then(() => this.closeModal())
         }
     },
-    setup() {
+    setup() {  
         const store = useStore()
         store.dispatch(GET_TASKS)
         store.dispatch(GET_PROJECTS)
 
         return {
             store,
-            tasks:  computed(() => store.state.tasks)
+            tasks:  computed(() => store.state.task.tasks)
         }
     }
 });

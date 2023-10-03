@@ -1,16 +1,13 @@
-import IProject from "@/interfaces/IProject";
 import { InjectionKey } from "vue";
 import { Store, createStore, useStore as vuexUseStore } from "vuex";
-import { ADD_PROJECT, UPDATE_PROJECT, DELETE_PROJECT, ADD_TASKS, DELETE_TASKS, NOTIFY, DEFINE_PROJECT } from "./typesMutations";
-import ITask from "@/interfaces/ITask";
 import { INotifications } from "@/interfaces/INotifications";
-import clientHTTP from "@/http";
-import { ALTER_PROJECTS, DEFINE_TASKS, GET_PROJECTS, GET_TASKS, REGISTER_PROJECTS, REGISTER_TASKS, REMOVE_PROJECTS } from "./typeActions";
-import { HttpStatusCode } from "axios";
+import { StateProject, project } from "./modules/project";
+import { StateTask, task, } from "./modules/task";
+import { NOTIFY } from "./typesMutations";
 
-interface State {
-    projects: IProject[]
-    tasks: ITask[]
+export interface State {
+    project: StateProject
+    task: StateTask
     notifications: INotifications[]
 }
 
@@ -18,38 +15,15 @@ export const key: InjectionKey<Store<State>> = Symbol()
 
 export const store = createStore<State>({
     state: {
-        projects: [],
-        tasks: [],
+        project: {
+            projects: []
+        },
+        task: {
+            tasks: []
+        },
         notifications: []
     },
     mutations: {
-        [ADD_PROJECT](state,projectName: string) {
-            const project = {
-                id: new Date().toISOString(),
-                name: projectName
-            } as IProject
-
-            state.projects.push(project)
-        },
-        [UPDATE_PROJECT](state, project: IProject) {
-            const idx = state.projects.findIndex(p => p.id == project.id)
-            state.projects[idx] = project
-        },
-        [DELETE_PROJECT](state, projectID: string){
-            state.projects = state.projects.filter(p => p.id != projectID)
-        },
-        [DEFINE_PROJECT](state, projects: IProject[]){
-            state.projects = projects
-        },
-        [ADD_TASKS](state,task: ITask) {
-            state.tasks.push(task)
-        },
-        [DELETE_TASKS](state, taskDescription: string){            
-            state.tasks = state.tasks.filter(t => t.description != taskDescription)
-        },
-        [DEFINE_TASKS](state, tasks: ITask[]){
-            state.tasks = tasks
-        },
         [NOTIFY](state, notification: INotifications) {
             notification.id = new Date().getTime()
             state.notifications.push(notification)
@@ -59,31 +33,9 @@ export const store = createStore<State>({
             }, 3000);
         }
     },
-    actions: {
-        [GET_PROJECTS] ({ commit }) {
-            clientHTTP.get('projetos')
-                .then(response => commit(DEFINE_PROJECT, response.data))
-        },
-        [REGISTER_PROJECTS](context, projectName: string) {
-            return clientHTTP.post('/projetos', {
-                name: projectName
-            })
-        },
-        [ALTER_PROJECTS](context, project: IProject) {
-            return clientHTTP.put(`/projetos/${project.id}`, project)
-        },
-        [REMOVE_PROJECTS]({ commit }, projectID: string){
-            return clientHTTP.delete(`/projetos/${projectID}`)
-                .then(() => commit(DELETE_PROJECT, projectID))
-        },
-        [GET_TASKS] ({ commit }) {
-            clientHTTP.get('tarefas')
-                .then(response => commit(DEFINE_TASKS, response.data))
-        },
-        [REGISTER_TASKS]({ commit }, task: ITask) {
-            return clientHTTP.post('/tarefas', task)
-                .then(response => commit(ADD_TASKS, response.data))
-        },
+    modules: {
+        project,
+        task
     }
 })
 
