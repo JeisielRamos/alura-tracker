@@ -16,25 +16,22 @@
             <BoxCard v-if="tasksIsEmpty">
                 Você não está muito produtivo hoje :(
             </BoxCard>
-            <div class="modal" :class="{ 'is-active': task }" v-if="task">
-                <div class="modal-background"></div>
-                <div class="modal-card">
-                    <header class="modal-card-head">
-                        <p class="modal-card-title">Modal title</p>
-                        <button class="delete" aria-label="close" @click="closeModal"></button>
-                    </header>
-                    <section class="modal-card-body">
-                        <div class="field">
-                            <label for="description" class="label"> Descrição </label>
-                            <input type="text" class="input" v-model="task.description" id="description">
-                        </div>
-                    </section>
-                    <footer class="modal-card-foot">
-                        <button class="button is-success" @click="updateTask">Alterar Tarefa</button>
-                        <button class="button" @click="closeModal">Cancelar</button>
-                    </footer>
-                </div>
-            </div>
+            <ModalTask :show="task != null">
+                <template v-slot:header>
+                    <p class="modal-card-title">Modal title</p>
+                    <button class="delete" aria-label="close" @click="closeModal"></button>
+                </template>
+                <template v-slot:section>
+                    <div class="field">
+                        <label for="description" class="label"> Descrição </label>
+                        <input type="text" class="input" v-model="task.description" id="description">
+                    </div>
+                </template>
+                <template v-slot:footer>
+                    <button class="button is-success" @click="updateTask">Alterar Tarefa</button>
+                    <button class="button" @click="closeModal">Cancelar</button>
+                </template>
+            </ModalTask>
         </div>
     </div>
 </template>
@@ -44,6 +41,7 @@ import { computed, defineComponent, ref, watchEffect } from 'vue';
 import FormTask from '../components/FormTask.vue'
 import TaskItem from '../components/TaskItem.vue';
 import BoxCard from '../components/BoxCard.vue';
+import ModalTask from '../components/ModalTask.vue';
 import { useStore } from '@/store';
 import { DELETE_TASKS } from '@/store/typesMutations';
 import { ALTER_TASK, GET_PROJECTS, GET_TASKS } from '@/store/typeActions';
@@ -54,7 +52,8 @@ export default defineComponent({
     components: {
         FormTask,
         BoxCard,
-        TaskItem
+        TaskItem,
+        ModalTask
     },
     data() {
         return {
